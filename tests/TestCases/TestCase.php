@@ -31,4 +31,5 @@ abstract class TestCase extends LumenTestCase
     {
         return new Request($data ?? []);
     }
+
 }

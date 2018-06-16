@@ -183,7 +183,7 @@ class MailChimpList extends MailChimpEntity
      *
      * @return MailChimpList
      */
-    public function setEmailTypeOption(string $emailTypeOption): MailChimpList
+    public function setEmailTypeOption(bool $emailTypeOption): MailChimpList
     {
         $this->emailTypeOption = $emailTypeOption;
 

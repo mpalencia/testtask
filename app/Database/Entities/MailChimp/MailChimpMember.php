@@ -55,6 +55,17 @@ class MailChimpMember extends MailChimpEntity
     protected $mailChimpList;
 
     /**
+     * Get member's id
+     *
+     * @return null|string
+     */
+    public function getId(): ?string
+    {
+        return $this->memberId;
+    }
+
+
+    /**
      * Get member's list id
      *
      * @return null|string
