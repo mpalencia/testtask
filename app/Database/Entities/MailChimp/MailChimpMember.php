@@ -28,6 +28,13 @@ class MailChimpMember extends MailChimpEntity
     private $listId;
 
     /**
+     * @ORM\Column(name="mail_chimp_id", type="string", nullable=true)
+     *
+     * @var string
+     */
+    private $mailChimpId;
+
+    /**
      * @ORM\Column(name="email_address", type="string")
      *
      * @var string
@@ -76,6 +83,16 @@ class MailChimpMember extends MailChimpEntity
     }
 
     /**
+     * Get mailchimp id of the list.
+     *
+     * @return null|string
+     */
+    public function getMailChimpId(): ?string
+    {
+        return $this->mailChimpId;
+    }
+
+    /**
      * Get member's subscriber hash
      *
      * @return null|string
@@ -113,6 +130,7 @@ class MailChimpMember extends MailChimpEntity
 
         return $this;
     }
+
 
     /**
      * Set Email Address of the member.
@@ -152,6 +170,20 @@ class MailChimpMember extends MailChimpEntity
     public function setSubscriberHash(string $subscriberHash): MailChimpMember
     {
         $this->subscriberHash = $subscriberHash;
+
+        return $this;
+    }
+
+    /**
+     * Set mailchimp id of the list.
+     *
+     * @param string $mailChimpId
+     *
+     * @return \App\Database\Entities\MailChimp\MailChimpList
+     */
+    public function setMailChimpId(string $mailChimpId): MailChimpMember
+    {
+        $this->mailChimpId = $mailChimpId;
 
         return $this;
     }

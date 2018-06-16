@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\App\TestCases\MailChimp;
 
+use App\Database\Entities\MailChimp\MailChimpList;
 use App\Database\Entities\MailChimp\MailChimpMember;
 use Illuminate\Http\JsonResponse;
 use Mailchimp\Mailchimp;
@@ -49,15 +50,20 @@ abstract class MemberTestCase extends WithDatabaseTestCase
     ];
 
     protected static $memberData = [
-        'email_address' => 'test@member.com',
+        'list_id' => '23235b6c-6f22-11e8-8ebf-bcaec53bdfcc',
+        'mail_chimp_id' => 'bf37a694c0',
+        'email_address' => null,
         'status' => 'subscribed',
+        'subscriber_hash' => 'md5-of-email-address'
     ];
 
     /**
      * @var array
      */
     protected static $notRequired = [
-        'list_id'
+        'list_id',
+        'mail_chimp_id',
+        'subscriber_hash'
     ];
 
 
@@ -111,6 +117,23 @@ abstract class MemberTestCase extends WithDatabaseTestCase
         self::assertEquals(400, $response->getStatusCode());
         self::assertArrayHasKey('message', $content);
         self::assertEquals(self::MAILCHIMP_EXCEPTION_MESSAGE, $content['message']);
+    }
+
+    /**
+     * Create MailChimp list into database.
+     *
+     * @param array $data
+     *
+     * @return \App\Database\Entities\MailChimp\MailChimpList
+     */
+    protected function createList(array $data): MailChimpList
+    {
+        $list = new MailChimpList($data);
+
+        $this->entityManager->persist($list);
+        $this->entityManager->flush();
+
+        return $list;
     }
 
     /**

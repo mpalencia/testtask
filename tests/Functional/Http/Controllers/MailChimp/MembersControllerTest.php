@@ -15,7 +15,6 @@ class MembersControllerTest extends MemberTestCase
      */
     public function testCreateMemberSuccessfully(): void
     {
-
         $this->post('/mailchimp/lists', static::$listData);
         $list = \json_decode($this->response->content(), true);
 
@@ -23,6 +22,13 @@ class MembersControllerTest extends MemberTestCase
             $this->createdListIds[] = $list['mail_chimp_id']; // Store MailChimp list id for cleaning purposes
         }
 
+        $createList = $this->createList(static::$listData);
+
+        $randomEmail = ''.str_shuffle("abcdefghi").'@testmail.com';
+        static::$memberData['list_id'] = $createList->getId();
+        static::$memberData['mail_chimp_id'] = $list['mail_chimp_id'];
+        static::$memberData['email_address'] = $randomEmail;
+        static::$memberData['subscriber_hash'] = md5($randomEmail);
         $this->post(\sprintf('/mailchimp/members/%s', $list['mail_chimp_id']), static::$memberData);
         $content = \json_decode($this->response->getContent(), true);
 
@@ -30,11 +36,6 @@ class MembersControllerTest extends MemberTestCase
         $this->seeJson(static::$memberData);
         self::assertArrayHasKey('subscriber_hash', $content);
         self::assertNotNull($content['subscriber_hash']);
-
-        if (isset($content['subscriber_hash'])) {
-            $this->createdMembersSubscriberHash[] = $content['subscriber_hash']; // Store MailChimp member subscriber_hash for cleaning purposes
-        }
-
     }
 
     /**
@@ -54,9 +55,9 @@ class MembersControllerTest extends MemberTestCase
         self::assertEquals('Invalid data given', $content['message']);
 
         foreach (\array_keys(static::$memberData) as $key) {
-            // if (\in_array($key, static::$notRequired, true)) {
-            //     continue;
-            // }
+            if (\in_array($key, static::$notRequired, true)) {
+                continue;
+            }
 
             self::assertArrayHasKey($key, $content['errors']);
         }
@@ -91,15 +92,13 @@ class MembersControllerTest extends MemberTestCase
         }
 
         //create member
+        static::$memberData['email_address'] = ''.str_shuffle("abcdefghi").'@testmail.com';
         $this->post(\sprintf('/mailchimp/members/%s', $list['mail_chimp_id']), static::$memberData);
         $member = \json_decode($this->response->getContent(), true);
 
-        if (isset($member['subscriber_hash'])) {
-            $this->createdMembersSubscriberHash[] = $member['subscriber_hash']; // Store MailChimp member subscriber_hash for cleaning purposes
-        }
-
         $createMember = $this->createMember([
-            'list_id' => $list['mail_chimp_id'],
+            'list_id' => str_shuffle("abcdefghi"), //random string for testing
+            'mail_chimp_id' => $list['mail_chimp_id'],
             'email_address' => static::$memberData['email_address'],
             'status' => static::$memberData['status'],
             'subscriber_hash' => $member['subscriber_hash']
@@ -107,7 +106,8 @@ class MembersControllerTest extends MemberTestCase
 
         //delete member
         $this->delete(\sprintf('/mailchimp/members/%s', $createMember->getId()));
-
+        $delete = \json_decode($this->response->content(), true);
+        
         $this->assertResponseOk();
         self::assertEmpty(\json_decode($this->response->content(), true));
     }
@@ -173,20 +173,19 @@ class MembersControllerTest extends MemberTestCase
         }
 
         //create member
+        static::$memberData['email_address'] = ''.str_shuffle("abcdefghi").'@testmail.com';
         $this->post(\sprintf('/mailchimp/members/%s', $list['mail_chimp_id']), static::$memberData);
         $member = \json_decode($this->response->getContent(), true);
-
-        if (isset($member['subscriber_hash'])) {
-            $this->createdMembersSubscriberHash[] = $member['subscriber_hash']; // Store MailChimp member subscriber_hash for cleaning purposes
-        }
         
         $createMember = $this->createMember([
-            'list_id' => $list['mail_chimp_id'],
+            'list_id' => str_shuffle("abcdefghi"), //random string for testing
+            'mail_chimp_id' => $list['mail_chimp_id'],
             'email_address' => static::$memberData['email_address'],
             'status' => static::$memberData['status'],
             'subscriber_hash' => $member['subscriber_hash']
         ]);
 
+        //update member
         $this->put(\sprintf('/mailchimp/members/%s', $createMember->getId()), ['email_address' => 'update@mail.com']);
         $content = \json_decode($this->response->content(), true);
 
@@ -214,20 +213,19 @@ class MembersControllerTest extends MemberTestCase
         }
 
         //create member
+        static::$memberData['email_address'] = ''.str_shuffle("abcdefghi").'@testmail.com';
         $this->post(\sprintf('/mailchimp/members/%s', $list['mail_chimp_id']), static::$memberData);
         $member = \json_decode($this->response->getContent(), true);
-
-        if (isset($member['subscriber_hash'])) {
-            $this->createdMembersSubscriberHash[] = $member['subscriber_hash']; // Store MailChimp member subscriber_hash for cleaning purposes
-        }
         
         $createMember = $this->createMember([
-            'list_id' => $list['mail_chimp_id'],
+            'list_id' => str_shuffle("abcdefghi"), //random string for testing
+            'mail_chimp_id' => $list['mail_chimp_id'],
             'email_address' => static::$memberData['email_address'],
             'status' => static::$memberData['status'],
             'subscriber_hash' => $member['subscriber_hash']
         ]);
 
+        //update member
         $this->put(\sprintf('/mailchimp/members/%s', $createMember->getId()), []);
 
         $content = \json_decode($this->response->content(), true);
